@@ -185,5 +185,7 @@ def eligible_students(job_id):
     return render_template("eligible.html", job=job, students=eligible)
 
 
+init_db()
+
 if __name__ == "__main__":
     app.run(debug=True)
