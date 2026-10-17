@@ -1,0 +1,130 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Eligible Students | CampusConnect</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<header class="topbar">
+    <div class="brand">
+        <div class="brand-icon">CC</div>
+        <div>
+            <h1>CampusConnect</h1>
+            <p>Student Placement Management System</p>
+        </div>
+    </div>
+</header>
+
+<main class="container">
+
+    <section class="panel section-panel">
+        <a class="back-link" href="{{ url_for('index') }}">
+            ← Back to Dashboard
+        </a>
+
+        <div class="eligibility-header">
+            <span class="eyebrow">PLACEMENT ELIGIBILITY</span>
+
+            <h2>{{ job.company }}</h2>
+            <h3>{{ job.role }}</h3>
+
+            <p>
+                Minimum CGPA:
+                <strong>{{ "%.2f"|format(job.min_cgpa) }}</strong>
+            </p>
+
+            <p>
+                Required Skills:
+                <strong>{{ job.required_skills }}</strong>
+            </p>
+        </div>
+
+        <div class="section-heading">
+            <div>
+                <h3>Eligible Students</h3>
+                <p>Students matching the CGPA and all required skills.</p>
+            </div>
+
+            <span class="count-tag">
+                {{ students|length }} eligible
+            </span>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Email</th>
+                        <th>Branch</th>
+                        <th>CGPA</th>
+                        <th>Skills</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td>
+                            <div class="student-name">
+                                {{ student.name }}
+                            </div>
+                        </td>
+
+                        <td>{{ student.email }}</td>
+
+                        <td>
+                            <span class="branch-tag">
+                                {{ student.branch }}
+                            </span>
+                        </td>
+
+                        <td>
+                            <strong>
+                                {{ "%.2f"|format(student.cgpa) }}
+                            </strong>
+                        </td>
+
+                        <td>{{ student.skills }}</td>
+                    </tr>
+
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="empty-state">
+                            <div>🔎</div>
+                            <strong>No eligible students found</strong>
+                            <p>
+                                No registered student currently matches
+                                both the CGPA and required skills.
+                            </p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <a class="button-link"
+           href="{{ url_for('index') }}">
+            Return to Dashboard
+        </a>
+
+    </section>
+
+</main>
+
+<footer>
+    <strong>CampusConnect</strong>
+    <p>Student Placement Management System · Built with Python and Flask</p>
+</footer>
+
+</body>
+</html>

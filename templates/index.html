@@ -1,0 +1,254 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampusConnect | Placement Management</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<header class="topbar">
+    <div class="brand">
+        <div class="brand-icon">CC</div>
+        <div>
+            <h1>CampusConnect</h1>
+            <p>Student Placement Management System</p>
+        </div>
+    </div>
+    <span class="status">● Placement Portal</span>
+</header>
+
+<main class="container">
+
+    <section class="welcome">
+        <div>
+            <span class="eyebrow">CAMPUS CAREER PLATFORM</span>
+            <h2>Build your future.<br>Manage placements smarter.</h2>
+            <p>Manage student profiles, discover placement opportunities,
+               and identify eligible candidates from one dashboard.</p>
+        </div>
+        <div class="welcome-icon">🎓</div>
+    </section>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="alert {{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
+
+    <section class="stats">
+        <article class="stat-card">
+            <div class="stat-icon blue">👨‍🎓</div>
+            <p>Total Students</p>
+            <h2>{{ total_students }}</h2>
+            <span>Registered student profiles</span>
+        </article>
+
+        <article class="stat-card">
+            <div class="stat-icon purple">💼</div>
+            <p>Placement Opportunities</p>
+            <h2>{{ total_jobs }}</h2>
+            <span>Available job listings</span>
+        </article>
+    </section>
+
+    <section class="forms-grid">
+
+        <form class="panel" action="{{ url_for('add_student') }}"
+              method="POST">
+            <div class="panel-heading">
+                <div class="panel-icon">👤</div>
+                <div>
+                    <h3>Register a Student</h3>
+                    <p>Add a student profile to the directory.</p>
+                </div>
+            </div>
+
+            <label for="name">Full Name</label>
+            <input id="name" name="name" type="text"
+                   placeholder="Enter full name" required>
+
+            <label for="email">Email Address</label>
+            <input id="email" name="email" type="email"
+                   placeholder="student@example.com" required>
+
+            <label for="branch">Branch</label>
+            <select id="branch" name="branch" required>
+                <option value="">Select branch</option>
+                <option value="CSE">Computer Science (CSE)</option>
+                <option value="AIML">AI & Machine Learning (AIML)</option>
+                <option value="ECE">Electronics (ECE)</option>
+                <option value="EEE">Electrical (EEE)</option>
+                <option value="IT">Information Technology (IT)</option>
+                <option value="Other">Other</option>
+            </select>
+
+            <label for="cgpa">CGPA (0–10)</label>
+            <input id="cgpa" name="cgpa" type="number"
+                   min="0" max="10" step="0.01"
+                   placeholder="e.g. 8.25" required>
+
+            <label for="skills">Skills</label>
+            <input id="skills" name="skills" type="text"
+                   placeholder="Python, SQL, HTML" required>
+
+            <button type="submit" class="primary-btn">
+                + Add Student
+            </button>
+        </form>
+
+        <form class="panel" action="{{ url_for('add_job') }}"
+              method="POST">
+            <div class="panel-heading">
+                <div class="panel-icon purple-bg">💼</div>
+                <div>
+                    <h3>Add Placement Opportunity</h3>
+                    <p>Create a company job listing.</p>
+                </div>
+            </div>
+
+            <label for="company">Company Name</label>
+            <input id="company" name="company" type="text"
+                   placeholder="e.g. Accenture" required>
+
+            <label for="role">Job Role</label>
+            <input id="role" name="role" type="text"
+                   placeholder="e.g. Software Developer" required>
+
+            <label for="min_cgpa">Minimum CGPA</label>
+            <input id="min_cgpa" name="min_cgpa" type="number"
+                   min="0" max="10" step="0.01"
+                   placeholder="e.g. 7.00" required>
+
+            <label for="required_skills">Required Skills</label>
+            <input id="required_skills" name="required_skills"
+                   type="text" placeholder="Python, SQL" required>
+
+            <button type="submit" class="primary-btn purple-btn">
+                + Add Opportunity
+            </button>
+        </form>
+
+    </section>
+
+    <section class="panel section-panel">
+        <div class="section-heading">
+            <div>
+                <h3>Student Directory</h3>
+                <p>Search, review and manage student profiles.</p>
+            </div>
+
+            <form class="search-form" method="GET"
+                  action="{{ url_for('index') }}">
+                <input type="search" name="search"
+                       value="{{ search }}"
+                       placeholder="Search students...">
+                <button type="submit" class="search-btn">Search</button>
+                {% if search %}
+                    <a class="clear-link"
+                       href="{{ url_for('index') }}">Clear</a>
+                {% endif %}
+            </form>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Branch</th>
+                        <th>CGPA</th>
+                        <th>Skills</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td>
+                            <div class="student-name">{{ student.name }}</div>
+                            <small>{{ student.email }}</small>
+                        </td>
+                        <td><span class="branch-tag">{{ student.branch }}</span></td>
+                        <td><strong>{{ "%.2f"|format(student.cgpa) }}</strong></td>
+                        <td>{{ student.skills }}</td>
+                        <td>
+                            <form method="POST"
+                                  action="{{ url_for('delete_student', student_id=student.id) }}"
+                                  onsubmit="return confirm('Delete this student?');">
+                                <button type="submit" class="danger-btn">
+                                    Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="empty-state">
+                            <div>👨‍🎓</div>
+                            <strong>No students found</strong>
+                            <p>Add a student using the form above.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="panel section-panel">
+        <div class="section-heading">
+            <div>
+                <h3>Placement Opportunities</h3>
+                <p>Review openings and check student eligibility.</p>
+            </div>
+            <span class="count-tag">{{ total_jobs }} opportunities</span>
+        </div>
+
+        <div class="jobs-grid">
+            {% for job in jobs %}
+            <article class="job-card">
+                <div class="company-icon">💼</div>
+                <span class="eyebrow">{{ job.company }}</span>
+                <h4>{{ job.role }}</h4>
+                <p><strong>Minimum CGPA:</strong> {{ "%.2f"|format(job.min_cgpa) }}</p>
+                <p><strong>Required skills:</strong> {{ job.required_skills }}</p>
+
+                <a class="button-link"
+                   href="{{ url_for('eligible_students', job_id=job.id) }}">
+                    View Eligible Students →
+                </a>
+
+                <form method="POST"
+                      action="{{ url_for('delete_job', job_id=job.id) }}"
+                      onsubmit="return confirm('Delete this opportunity?');">
+                    <button type="submit" class="danger-btn">
+                        Delete Opportunity
+                    </button>
+                </form>
+            </article>
+            {% else %}
+            <div class="empty-state">
+                <div>💼</div>
+                <strong>No placement opportunities yet</strong>
+                <p>Add a job using the form above.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+</main>
+
+<footer>
+    <strong>CampusConnect</strong>
+    <p>Student Placement Management System · Built with Python and Flask</p>
+</footer>
+
+</body>
+</html>
